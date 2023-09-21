@@ -1,0 +1,37 @@
+#include <vector>
+#include <unordered_map>
+
+class Solution {
+public:
+    int minOperations(std::vector<int>& nums, int x) {
+        int n = nums.size();
+        int target = -x;  // We want to find a subarray sum equal to target = -x.
+        for (int num : nums) {
+            target += num;
+        }
+
+        if (target == 0) {
+            return n;  // If the sum of all elements equals x, then we can remove all elements.
+        }
+
+        std::unordered_map<int, int> prefixSum;
+        prefixSum[0] = -1;  // Initialize the prefix sum with 0 at index -1.
+
+        int maxLength = -1;  // Initialize the maximum subarray length to -1.
+        int currentSum = 0;
+
+        for (int i = 0; i < n; ++i) {
+            currentSum += nums[i];
+            if (prefixSum.find(currentSum - target) != prefixSum.end()) {
+                // If we have seen a prefix sum of currentSum - target before,
+                // it means there is a subarray with the target sum.
+                int length = i - prefixSum[currentSum - target];
+                maxLength = std::max(maxLength, length);
+            }
+
+            prefixSum[currentSum] = i;  // Store the current prefix sum with its index.
+        }
+
+        return maxLength == -1 ? -1 : n - maxLength;
+    }
+};
